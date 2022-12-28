@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "46761386262",
+    "project_id": "chatboxapp-ecfe7",
+    "storage_bucket": "chatboxapp-ecfe7.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:46761386262:android:036fab324b93b8766a3037",
+        "android_client_info": {
+          "package_name": "com.example.chatboxapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "46761386262-vicbigd472fdkkjfkm4k2qfvurprvdls.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDqMhHSNuHeTvdEC_punetKCiv1QCvBpLk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "46761386262-vicbigd472fdkkjfkm4k2qfvurprvdls.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
