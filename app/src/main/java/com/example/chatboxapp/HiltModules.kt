@@ -17,9 +17,7 @@ import javax.inject.Singleton
 @Module
 @InstallIn(ViewModelComponent::class, FragmentComponent::class, SingletonComponent::class)
 object FirstModule {
-    private var viewModel: MainViewModel = MainViewModel()
-
+    @Singleton
     @Provides
-    fun getMainActivityInstance() = MainActivity()
-
+    fun getMainActivityInstance() = MainViewModel()
 }

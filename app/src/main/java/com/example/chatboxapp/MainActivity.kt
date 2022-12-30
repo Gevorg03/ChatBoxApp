@@ -18,7 +18,10 @@ import androidx.lifecycle.lifecycleScope
 import com.example.chatboxapp.databinding.ActivityMainBinding
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collectLatest
+import javax.inject.Singleton
 
+@Singleton
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
@@ -37,9 +40,15 @@ class MainActivity : AppCompatActivity() {
 
         auth = FirebaseAuth.getInstance()
 
-        mainViewModel.currentFragment.value = SplashFragment()
+//        mainViewModel.currentFragment.value = SplashFragment()
+        Toast.makeText(
+            applicationContext,
+            mainViewModel.currentFragment.value.toString(),
+            Toast.LENGTH_SHORT
+        ).show()
+
         supportFragmentManager.beginTransaction()
-            .replace(R.id.fragmnet_container, SplashFragment())
+            .replace(R.id.fragmnet_container, mainViewModel.currentFragment.value)
             .commit()
     }
 
@@ -61,10 +70,5 @@ class MainActivity : AppCompatActivity() {
             R.id.action_settings -> true
             else -> super.onOptionsItemSelected(item)
         }
-    }
-
-    override fun onStart() {
-        super.onStart()
-
     }
 }

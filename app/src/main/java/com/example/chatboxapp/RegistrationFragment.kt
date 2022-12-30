@@ -156,8 +156,6 @@ class RegistrationFragment : Fragment() {
                     ?.replace(R.id.fragmnet_container, LoginFragment())?.commit()
             }
 
-
-
             btnRegister.setOnClickListener {
                 val postRef = Firebase.database.reference.child("users")
                 val postRef1 = databaseReference.child("users").child("")
@@ -192,9 +190,15 @@ class RegistrationFragment : Fragment() {
                                                                         .child("phone")
                                                                         .setValue(phone)
                                                                     auth.signOut()
-                                                                    helperText.values.forEach { v -> v.value = "" }
-                                                                    errorText.values.forEach { v -> v.value = "" }
-                                                                    viewModel.data.values.forEach{ v -> v.value = ""}
+                                                                    helperText.values.forEach { v ->
+                                                                        v.value = ""
+                                                                    }
+                                                                    errorText.values.forEach { v ->
+                                                                        v.value = ""
+                                                                    }
+                                                                    viewModel.data.values.forEach { v ->
+                                                                        v.value = ""
+                                                                    }
                                                                     val us =
                                                                         FirebaseAuth.getInstance().currentUser
                                                                     us?.sendEmailVerification()

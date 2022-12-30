@@ -9,6 +9,7 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.fragment.app.FragmentTransaction
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import com.example.chatboxapp.databinding.FragmentLoginBinding
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.gms.tasks.Task
@@ -16,19 +17,37 @@ import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collectLatest
 import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
 @AndroidEntryPoint
 class LoginFragment : Fragment() {
     private var binding: FragmentLoginBinding? = null
-    val mainViewModel: MainViewModel by activityViewModels()
     lateinit var auth: FirebaseAuth
+
+    @Inject
+    lateinit var mainObjViewModel: MainViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         auth = FirebaseAuth.getInstance()
+
+        Toast.makeText(requireContext(), mainObjViewModel.toString(), Toast.LENGTH_SHORT).show()
+
+        lifecycleScope.launchWhenCreated {
+            mainObjViewModel.currentFragment.collectLatest { fragment ->
+//                Toast.makeText(requireContext(), fragment.toString(), Toast.LENGTH_SHORT).show()
+                if (!fragment.toString().contains("Splash")) {
+                    activity?.supportFragmentManager?.beginTransaction()
+                        ?.replace(R.id.fragmnet_container, fragment)
+                        ?.commit()
+                }
+            }
+        }
 
         return FragmentLoginBinding.inflate(inflater, container, false)
             .also { binding = it }.root
@@ -38,15 +57,7 @@ class LoginFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         binding?.run {
             signUp.setOnClickListener {
-//                val fm = activity?.supportFragmentManager
-//                fm?.beginTransaction()
-//                    ?.replace(R.id.fragmnet_container, RegistrationFragment())
-//                    ?.commit()
-//                fm?.popBackStack()
-                mainViewModel.currentFragment.value = RegistrationFragment()
-                activity?.supportFragmentManager?.beginTransaction()
-                    ?.replace(R.id.fragmnet_container, mainViewModel.currentFragment.value)
-                    ?.commit()
+                mainObjViewModel.currentFragment.value = RegistrationFragment()
             }
             signIn.setOnClickListener {
                 auth.signInWithEmailAndPassword(
