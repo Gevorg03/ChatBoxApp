@@ -55,7 +55,6 @@ class RegistrationFragment : Fragment() {
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        println("barev")
     }
 
 
@@ -66,7 +65,7 @@ class RegistrationFragment : Fragment() {
             "user" to binding?.inputFullname,
             "email" to binding?.inputEmail,
             "phone" to binding?.inputPhone,
-            "password" to binding?.inputPass
+            "pass" to binding?.inputPass
         )
 
         val helperText = mapOf(
@@ -82,8 +81,6 @@ class RegistrationFragment : Fragment() {
             binding?.phoneLayout to viewModel.phoneErrorText,
             binding?.passLayout to viewModel.passErrorText
         )
-
-        val viewModelComponents = listOf(viewModel.fullnameHelperText)
 
         binding?.run {
             ccp.registerCarrierNumberEditText(inputPhone)

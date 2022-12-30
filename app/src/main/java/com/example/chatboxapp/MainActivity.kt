@@ -21,7 +21,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import javax.inject.Singleton
 
-@Singleton
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
@@ -40,16 +39,14 @@ class MainActivity : AppCompatActivity() {
 
         auth = FirebaseAuth.getInstance()
 
-//        mainViewModel.currentFragment.value = SplashFragment()
-        Toast.makeText(
-            applicationContext,
-            mainViewModel.currentFragment.value.toString(),
-            Toast.LENGTH_SHORT
-        ).show()
-
-        supportFragmentManager.beginTransaction()
-            .replace(R.id.fragmnet_container, mainViewModel.currentFragment.value)
-            .commit()
+        //mainViewModel.currentFragment.value = SplashFragment()
+        lifecycleScope.launchWhenCreated {
+            mainViewModel.currentFragment.collectLatest { fragment ->
+                supportFragmentManager.beginTransaction()
+                    .replace(R.id.fragmnet_container, fragment)
+                    .commit()
+            }
+        }
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {

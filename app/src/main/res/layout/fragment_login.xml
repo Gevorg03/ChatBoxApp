@@ -36,6 +36,10 @@
             app:boxBackgroundMode="outline"
             app:boxStrokeColor="@color/black"
             app:boxStrokeWidth="2dp"
+            app:errorEnabled="true"
+            app:errorIconDrawable="@drawable/ic_error"
+            app:errorIconTint="@color/red"
+            app:errorTextColor="@color/red"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tv_login">
 
