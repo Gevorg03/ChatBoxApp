@@ -1,26 +1,14 @@
 package com.example.chatboxapp
 
-import android.content.res.Configuration
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
-import com.google.android.material.snackbar.Snackbar
 import androidx.appcompat.app.AppCompatActivity
-import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.navigateUp
-import androidx.navigation.ui.setupActionBarWithNavController
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.Toast
 import androidx.activity.viewModels
-import androidx.core.content.ContentProviderCompat.requireContext
-import androidx.lifecycle.lifecycleScope
 import com.example.chatboxapp.databinding.ActivityMainBinding
+import com.example.chatboxapp.fragments.LoginFragment
 import com.google.firebase.auth.FirebaseAuth
-import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.collectLatest
-import javax.inject.Singleton
 
 //@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
