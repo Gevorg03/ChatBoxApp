@@ -2,14 +2,13 @@ package com.example.chatboxapp
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.graphics.Bitmap.Config
 import android.os.Bundle
 import android.view.*
-import androidx.fragment.app.Fragment
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.core.widget.doAfterTextChanged
 import androidx.core.widget.doOnTextChanged
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import com.example.chatboxapp.databinding.FragmentRegistrationBinding
@@ -19,23 +18,19 @@ import com.google.android.material.textfield.TextInputLayout
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
-import com.google.firebase.database.ktx.database
-import com.google.firebase.ktx.Firebase
-import dagger.hilt.android.AndroidEntryPoint
+import com.google.firebase.auth.SignInMethodQueryResult
+import com.google.firebase.database.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collectLatest
 
-@AndroidEntryPoint
+//@AndroidEntryPoint
 class RegistrationFragment : Fragment() {
     private var binding: FragmentRegistrationBinding? = null
     private val viewModel: RegistrationViewModel by activityViewModels()
 
     lateinit var auth: FirebaseAuth
     private var user: FirebaseUser? = null
+    private var isFailed: Boolean = false
 
     private val databaseReference = FirebaseDatabase.getInstance()
         .getReferenceFromUrl("https://chatboxapp-ecfe7-default-rtdb.firebaseio.com/")
@@ -52,11 +47,6 @@ class RegistrationFragment : Fragment() {
             .also { binding = it }.root
 
     }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-    }
-
 
     @SuppressLint("SetTextI18n", "ResourceAsColor")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -152,110 +142,96 @@ class RegistrationFragment : Fragment() {
                 activity?.supportFragmentManager?.beginTransaction()
                     ?.replace(R.id.fragmnet_container, LoginFragment())?.commit()
             }
-
             btnRegister.setOnClickListener {
-                val postRef = Firebase.database.reference.child("users")
-                val postRef1 = databaseReference.child("users").child("")
+                isFailed = false
+                isFieldEmpty(fullnameLayout)
+                isFieldEmpty(emailLayout)
+                isFieldEmpty(phoneLayout)
+                isFieldEmpty(passLayout)
 
-                if (fullnameLayout.error != null || fullnameLayout.helperText != null) {
-                    if (emailLayout.error != null || emailLayout.helperText != null) {
-                        if (phoneLayout.error != null || phoneLayout.helperText != null) {
-                            if (passLayout.error != null || passLayout.helperText != null) {
-                                progressBar.visibility = View.VISIBLE
-                                val phone =
-                                    "${ccp.selectedCountryCodeWithPlus}${inputPhone.text.toString()}"
-                                postRef.addListenerForSingleValueEvent(object : ValueEventListener {
-                                    override fun onDataChange(dataSnapshot: DataSnapshot) {
-                                        if (!dataSnapshot.child(phone).exists()) {
-                                            databaseReference.child("users")
-                                                .addListenerForSingleValueEvent(object :
-                                                    ValueEventListener {
-                                                    override fun onDataChange(snapshot: DataSnapshot) {
-                                                        auth.createUserWithEmailAndPassword(
-                                                            inputEmail.text.toString(),
-                                                            inputPass.text.toString()
-                                                        )
-                                                            .addOnCompleteListener { task: Task<AuthResult> ->
-                                                                if (task.isSuccessful) {
-                                                                    val uid = auth.currentUser?.uid
-                                                                    databaseReference.child("users")
-                                                                        .child(uid.toString())
-                                                                        .child("username")
-                                                                        .setValue(inputFullname.text.toString())
-                                                                    databaseReference.child("users")
-                                                                        .child(uid.toString())
-                                                                        .child("phone")
-                                                                        .setValue(phone)
-                                                                    auth.signOut()
-                                                                    helperText.values.forEach { v ->
-                                                                        v.value = ""
-                                                                    }
-                                                                    errorText.values.forEach { v ->
-                                                                        v.value = ""
-                                                                    }
-                                                                    viewModel.data.values.forEach { v ->
-                                                                        v.value = ""
-                                                                    }
-                                                                    val us =
-                                                                        FirebaseAuth.getInstance().currentUser
-                                                                    us?.sendEmailVerification()
-                                                                    activity?.supportFragmentManager?.beginTransaction()
-                                                                        ?.replace(
-                                                                            R.id.fragmnet_container,
-                                                                            LoginFragment()
-                                                                        )?.commit()
-                                                                    Toast.makeText(
-                                                                        requireContext(),
-                                                                        "Successfully registered, please, check your email end verify to login",
-                                                                        Toast.LENGTH_SHORT
-                                                                    ).show()
-                                                                } else {
-                                                                    emailLayout.error =
-                                                                        "The email already exists"
-                                                                    emailLayout.helperText = null
-//                                                                    Toast.makeText(
-//                                                                        requireContext(),
-//                                                                        "The email already exists",
-//                                                                        Toast.LENGTH_SHORT
-//                                                                    ).show()
-                                                                    showKeyboard(inputEmail)
-                                                                }
-                                                            }
-                                                    }
-
-                                                    override fun onCancelled(error: DatabaseError) {
-                                                    }
-                                                })
-                                        } else {
-//                                            Toast.makeText(
-//                                                requireContext(),
-//                                                "Phone already is registered",
-//                                                Toast.LENGTH_SHORT
-//                                            ).show()
-                                            showKeyboard(
-                                                inputPhone,
+                if (!isFailed) {
+                    progressBar.visibility = View.VISIBLE
+                    val phone =
+                        "${ccp.selectedCountryCodeWithPlus}${inputPhone.text.toString()}"
+                    val db = FirebaseDatabase.getInstance()
+                    val ref = db.getReference("users")
+                    ref.addValueEventListener(object :
+                        ValueEventListener {
+                        override fun onDataChange(dataSnapshot: DataSnapshot) {
+                            if (!dataSnapshot.value.toString().contains(phone)) {
+                                auth.fetchSignInMethodsForEmail(inputEmail.text.toString())
+                                    .addOnCompleteListener { task: Task<SignInMethodQueryResult> ->
+                                        val isNewUser =
+                                            task.result.signInMethods?.isEmpty()
+                                        println(isNewUser)
+                                        if (isNewUser == true) {
+                                            existEmail(inputEmail.text.toString())
+                                            auth.createUserWithEmailAndPassword(
+                                                inputEmail.text.toString(),
+                                                inputPass.text.toString()
                                             )
+                                                .addOnCompleteListener { task: Task<AuthResult> ->
+                                                    if (task.isSuccessful) {
+                                                        val uid = auth.currentUser?.uid
+                                                        databaseReference.child("users")
+                                                            .child(uid.toString())
+                                                            .child("username")
+                                                            .setValue(inputFullname.text.toString())
+                                                        databaseReference.child("users")
+                                                            .child(uid.toString())
+                                                            .child("phone")
+                                                            .setValue(phone)
+                                                        helperText.values.forEach { v ->
+                                                            v.value = ""
+                                                        }
+                                                        errorText.values.forEach { v ->
+                                                            v.value = ""
+                                                        }
+                                                        viewModel.data.values.forEach { v ->
+                                                            v.value = ""
+                                                        }
+                                                        val us =
+                                                            FirebaseAuth.getInstance().currentUser
+                                                        us?.sendEmailVerification()
+                                                        auth.signOut()
+                                                        activity?.supportFragmentManager?.beginTransaction()
+                                                            ?.replace(
+                                                                R.id.fragmnet_container,
+                                                                LoginFragment()
+                                                            )?.commit()
+                                                        Toast.makeText(
+                                                            requireContext(),
+                                                            "Successfully registered, please, check your email end verify to login",
+                                                            Toast.LENGTH_SHORT
+                                                        ).show()
+                                                    } else {
+                                                        emailLayout.requestFocus()
+                                                        emailLayout.error =
+                                                            "Invalid Email"
+                                                        emailLayout.helperText = null
+                                                    }
+                                                }
+                                        } else {
+                                            emailLayout.requestFocus()
+                                            emailLayout.error =
+                                                "The email already exists"
+                                            emailLayout.helperText = null
                                         }
                                     }
-
-                                    override fun onCancelled(error: DatabaseError) {
-                                        TODO("Not yet implemented")
-                                    }
-                                })
-
-                                progressBar.visibility = View.GONE
                             } else {
-                                showKeyboard(inputPass)
+                                phoneLayout.requestFocus()
+                                phoneLayout.error =
+                                    "The phone already exists"
+                                phoneLayout.helperText = null
                             }
-                        } else {
-                            showKeyboard(inputPhone)
                         }
-                    } else {
-                        showKeyboard(inputEmail)
-                    }
-                } else {
-                    showKeyboard(inputFullname)
+
+                        override fun onCancelled(error: DatabaseError) {
+                            TODO("Not yet implemented")
+                        }
+                    })
                 }
+                progressBar.visibility = View.GONE
             }
         }
         super.onViewCreated(view, savedInstanceState)
@@ -270,8 +246,8 @@ class RegistrationFragment : Fragment() {
     private fun setHelperText(textInputLayout: TextInputLayout?, flow: MutableStateFlow<String?>) {
         lifecycleScope.launchWhenCreated {
             flow.collectLatest { text ->
-                if (text != null && text.isNotEmpty()) textInputLayout?.endIconMode =
-                    TextInputLayout.END_ICON_CUSTOM
+                if (text != null && text.isNotEmpty())
+                    textInputLayout?.endIconMode = TextInputLayout.END_ICON_CUSTOM
                 binding?.passLayout?.isPasswordVisibilityToggleEnabled = true
                 textInputLayout?.helperText = text
             }
@@ -281,8 +257,8 @@ class RegistrationFragment : Fragment() {
     private fun setErrorText(textInputLayout: TextInputLayout?, flow: MutableStateFlow<String?>) {
         lifecycleScope.launchWhenCreated {
             flow.collectLatest { text ->
-                if (text != null && text.isNotEmpty()) textInputLayout?.endIconMode =
-                    TextInputLayout.END_ICON_CUSTOM
+                if (text != null && text.isNotEmpty())
+                    textInputLayout?.endIconMode = TextInputLayout.END_ICON_CUSTOM
                 binding?.passLayout?.isPasswordVisibilityToggleEnabled = true
                 textInputLayout?.error = text
             }
@@ -331,20 +307,25 @@ class RegistrationFragment : Fragment() {
         //imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT)
     }
 
-    private fun existEmail(email: String): Boolean? {
-        var response: Boolean? = null
-
-        auth.fetchSignInMethodsForEmail(email).addOnCompleteListener { p0 ->
-            println("p0 is $p0")
-            if (p0.isSuccessful) {
-                val check = !p0.result.signInMethods?.isEmpty()!!
-                println("check is ${check}")
-                response = check
+    private fun existEmail(email: String) {
+        auth.fetchSignInMethodsForEmail(email)
+            .addOnCompleteListener { task: Task<SignInMethodQueryResult> ->
+                val isNewUser = task.result.signInMethods?.isNotEmpty()
+                println(isNewUser)
             }
+    }
+
+    private fun isFieldEmpty(textInputLayout: TextInputLayout) {
+        if (textInputLayout.error == null && textInputLayout.helperText == null) {
+            textInputLayout.error = "The field can not be empty"
+            textInputLayout.helperText = null
+            isFailed = true
         }
-        return response
     }
 }
 
-
-
+@IgnoreExtraProperties
+data class User(val phone: String? = null) {
+    // Null default values create a no-argument default constructor, which is needed
+    // for deserialization from a DataSnapshot.
+}

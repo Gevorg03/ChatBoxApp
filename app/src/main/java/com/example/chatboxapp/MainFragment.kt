@@ -5,18 +5,31 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.example.chatboxapp.databinding.FragmentMainBinding
+import com.example.chatboxapp.databinding.FragmentUsersBinding
 
 class MainFragment : Fragment() {
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
+    private var binding: FragmentMainBinding? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_main, container, false)
+        return FragmentMainBinding.inflate(inflater, container, false)
+            .also { binding = it }.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        binding?.run {
+            btnContacts.setOnClickListener {
+                activity?.supportFragmentManager?.beginTransaction()
+                    ?.replace(R.id.fragmnet_container, UsersFragment())
+                    ?.addToBackStack(null)
+                    ?.commit()
+            }
+        }
     }
 }

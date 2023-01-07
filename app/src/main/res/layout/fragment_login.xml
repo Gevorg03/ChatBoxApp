@@ -137,7 +137,7 @@
             android:visibility="invisible"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/sign_in" />
+            app:layout_constraintBottom_toTopOf="@id/sign_in" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

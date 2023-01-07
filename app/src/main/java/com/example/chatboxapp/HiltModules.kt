@@ -29,7 +29,7 @@ import javax.inject.Singleton
 object FirstModule {
     @Singleton
     @Provides
-    fun getMainActivityInstance() = MainViewModel()
+    fun getMainActivityInstance() = MainViewModel().currentFragment
 }
 
 //@Module

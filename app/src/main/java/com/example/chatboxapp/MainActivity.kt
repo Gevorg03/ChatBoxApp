@@ -14,6 +14,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
 import androidx.activity.viewModels
+import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.lifecycle.lifecycleScope
 import com.example.chatboxapp.databinding.ActivityMainBinding
 import com.google.firebase.auth.FirebaseAuth
@@ -21,7 +22,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import javax.inject.Singleton
 
-@AndroidEntryPoint
+//@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
@@ -40,18 +41,27 @@ class MainActivity : AppCompatActivity() {
         auth = FirebaseAuth.getInstance()
 
         //mainViewModel.currentFragment.value = SplashFragment()
-        lifecycleScope.launchWhenCreated {
-            mainViewModel.currentFragment.collectLatest { fragment ->
-                supportFragmentManager.beginTransaction()
-                    .replace(R.id.fragmnet_container, fragment)
-                    .commit()
-            }
-        }
+//        lifecycleScope.launchWhenCreated {
+//            mainViewModel.currentFragment.collectLatest { fragment ->
+//                supportFragmentManager.beginTransaction()
+//                    .replace(R.id.fragmnet_container, fragment)
+//                    .commit()
+//            }
+//        }
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.fragmnet_container, CurrFragment.fragment).commit()
+        if (CurrFragment.isDialogOpen)
+            LoginFragment().showRecoverPasswordDialog(this)
+
     }
 
-    override fun onConfigurationChanged(newConfig: Configuration) {
-        super.onConfigurationChanged(newConfig)
-    }
+//    override fun onConfigurationChanged(newConfig: Configuration) {
+//        super.onConfigurationChanged(newConfig)
+//        supportFragmentManager.beginTransaction()
+//            .replace(R.id.fragmnet_container, CurrFragment.fragment).commit()
+//
+//
+//    }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         // Inflate the menu; this adds items to the action bar if it is present.
