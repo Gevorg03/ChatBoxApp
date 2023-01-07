@@ -1,11 +1,12 @@
-package com.example.chatboxapp
+package com.example.chatboxapp.fragments
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.example.chatboxapp.fragments.LoginFragment
+import com.example.chatboxapp.CurrFragment
+import com.example.chatboxapp.R
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.*
 

@@ -27,7 +27,7 @@
     </fragment>
     <fragment
         android:id="@+id/splashFragment"
-        android:name="com.example.chatboxapp.SplashFragment"
+        android:name="com.example.chatboxapp.fragments.SplashFragment"
         android:label="fragment_splash"
         tools:layout="@layout/fragment_splash" >
         <action

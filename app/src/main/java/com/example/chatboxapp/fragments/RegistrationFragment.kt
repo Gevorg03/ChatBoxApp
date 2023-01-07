@@ -13,6 +13,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import com.example.chatboxapp.databinding.FragmentRegistrationBinding
 import com.example.chatboxapp.fragments.LoginFragment
+import com.example.chatboxapp.viewModels.RegistrationViewModel
 import com.google.android.gms.tasks.Task
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout

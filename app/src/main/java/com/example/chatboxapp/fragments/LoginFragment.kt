@@ -16,6 +16,8 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.example.chatboxapp.*
 import com.example.chatboxapp.databinding.FragmentLoginBinding
+import com.example.chatboxapp.viewModels.ForgetPassViewModel
+import com.example.chatboxapp.viewModels.LoginViewModel
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.google.firebase.auth.FirebaseAuth
